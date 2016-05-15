@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Layers Control Example</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+</head>
+<body>
+	<div id="map" style="width: 100%; height: 600px"></div>
+
+	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+	<script src="{{url_for('static', filename='js/jquery-2.2.3.min.js')}}"></script>
+	
+    <script src="{{url_for('static', filename='js/spin.js')}}"></script>
+    <script src="{{url_for('static', filename='js/leaflet.spin.js')}}"></script>
+	<script src="{{url_for('static', filename='js/leaflet.ajax.min.js')}}"></script>
+    	
+	<script>
+		var cities = new L.LayerGroup();
+
+		//L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.').addTo(cities),
+		//L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.').addTo(cities),
+		//L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.').addTo(cities),
+		//L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.').addTo(cities);
+
+
+	    var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+				
+			mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw';
+			montreal1Url = "{{url_for('static', filename='json/friche.geojson')}}";
+			montreal2Url = "{{url_for('static', filename='json/espace_vacant.geojson')}}";
+			montreal3Url = "{{url_for('static', filename='json/ahhhhh.geojson')}}";
+
+		var myStyle = {
+			"color": "#ff7800",
+			"weight": 1,
+			"opacity": 0.65
+		};
+
+		var myStyle2 = {
+			"color": "green",
+			"weight": 1,
+			"opacity": 0.65
+		};
+
+		var geojsonMarkerOptions = {
+			radius: 8,
+			fillColor: "purple",
+			color: "purple",
+			weight: 1,
+			opacity: 1,
+			fillOpacity: 0.3
+		};
+		
+	    var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox.light', attribution: mbAttr}),
+		    streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets',   attribution: mbAttr});
+
+		var geojsonLayer = new L.GeoJSON.AJAX(montreal1Url, {
+				style: myStyle
+			});       
+			
+		var geojsonLayer2 = new L.GeoJSON.AJAX(montreal2Url, {
+				style: myStyle2
+			});       
+		
+		var geojsonLayer3 = new L.GeoJSON.AJAX(montreal3Url, {
+			pointToLayer: function (feature, latlng) {
+				return L.circleMarker([latlng.lng, latlng.lat], geojsonMarkerOptions);
+			}	
+		}); 
+					
+		var map = L.map('map', {
+			center: [45.5017, -73.5673],
+			zoom: 10,
+			layers: [grayscale, cities, geojsonLayer, geojsonLayer2, geojsonLayer3]
+		});
+
+		var baseLayers = {
+			"Grayscale": grayscale
+			//"Streets": streets
+		};
+
+		var overlays = {
+			"Friches": geojsonLayer,	
+			"Espaces Vacants": geojsonLayer2,
+			"Contaminated": geojsonLayer3	
+
+		};
+
+		L.control.layers(baseLayers, overlays).addTo(map);
+
+
+	</script>
+</body>
+</html>

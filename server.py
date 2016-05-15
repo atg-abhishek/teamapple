@@ -1,11 +1,11 @@
-from flask import Flask 
-from dbManager import * 
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 @app.route('/')
-def hello():
-	return "Hello from the Tree Hackers team"
+def index():
+  return render_template("index.html")
+
 
 if __name__=='__main__':
-	app.run(port=8888)
+	app.run(port=8888, debug=True)
